@@ -58,7 +58,7 @@
             <form id="reservationForm" class="row g-3">
               <div class="col-md-3">
                 <label for="dateRange" class="form-label fw-bold">Check In/Out Date:</label>
-                <input type="text" id="dateRange" class="form-control" placeholder="Check-in to Check-out">
+                <input type="text" id="dateRange" class="form-control" placeholder="Select date range">
               </div>
               <div class="col-md-2">
                 <label for="roomType" class="form-label fw-bold">Room Type:</label>
@@ -360,11 +360,12 @@
     once: false
   });
 
-  // Initialize Litepicker date range picker
+  // Initialize Litepicker with Dual Calendar Date Picker
   new Litepicker({
     element: document.getElementById('dateRange'),
-    checkIn: new Date(),
-    checkOut: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+    singleMode: false,
+    numberOfMonths: 2,
+    tooltipText: [' check-in', ' check-out'],
     format: 'YYYY-MM-DD',
     lang: 'en-US'
   });
@@ -551,6 +552,7 @@
   </script>
 </body>
 </html>
+
 
 
 
