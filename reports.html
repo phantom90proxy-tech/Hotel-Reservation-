@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports</title>
+    <link rel = "icon" href = "assets/logo.jpg" type = "image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="loader">
+        <div class="spinner-border text-warning" role="status">
+            <span class="visually-hidden">Loading...</span>
+         </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+          <a class="navbar-brand fw-bold" href="main.html">
+            <img src="assets/logo.jpg" alt="Roomsy Logo" style="height:32px; vertical-align:middle;">
+            Roomsy
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+              <li class="nav-item"><a class="nav-link" href="main.html"><i class="fas fa-home"></i> Home</a></li>
+              <li class="nav-item"><a class="nav-link" href="room.html"><i class="fas fa-bed"></i> Rooms</a></li>
+              <li class="nav-item"><a class="nav-link" href="bookings.html"><i class="fas fa-calendar-check"></i> My Bookings <span class="badge bg-warning" id="bookingCount">0</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+              <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-info-circle"></i> About</a></li>
+              <li class="nav-item"><a class="nav-link" href="contact.html"><i class="fas fa-phone" aria-hidden="true"></i> Contact</a></li>
+            </ul>
+          </div>
+        </div>
+    </nav>
+
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Reports</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Bookings</h5>
+                            <p class="card-text fs-1" id="totalBookings">0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Revenue</h5>
+                            <p class="card-text fs-1" id="totalRevenue">$0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5">
+                <h3>Booking Status Overview</h3>
+                <canvas id="bookingChart" width="400" height="200"></canvas>
+            </div>
+            <div class="mt-5">
+                <h3>Recent Transactions</h3>
+                <table class="table table-striped" id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Booking ID</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Transactions will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-5">
+                <h3>Contact Messages</h3>
+                <div id="messagesList">
+                    <!-- Messages will be loaded here -->
+                </div>
+            </div>
+            <div class="mt-5">
+                <h3>Newsletter Subscribers</h3>
+                <ul id="subscribersList" class="list-group">
+                    <!-- Subscribers will be loaded here -->
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-darkblue text-light pt-5 pb-3">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-3 mb-4">
+              <h4 class="fw-bold text-warning">Roomsy</h4>
+              <div class="d-flex gap-3 my-3">
+                <a href="#" class="text-light fs-5"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="text-light fs-5"><i class="bi bi-twitter"></i></a>
+                <a href="#" class="text-light fs-5"><i class="bi bi-tiktok"></i></a>
+                <a href="#" class="text-light fs-5"><i class="bi bi-github"></i></a>
+              </div>
+              <p class="small">&copy; 2025 All rights reserved | Made by Carmen</p>
+            </div>
+            <div class="col-md-3 mb-4">
+              <h5 class="fw-bold mb-3">Quick Links</h5>
+              <ul class="list-unstyled">
+                <li><a href="#" class="text-light text-decoration-none">About Roomsy</a></li>
+                <li><a href="room.html" class="text-light text-decoration-none">Our Best Rooms</a></li>
+              </ul>
+            </div>
+            <div class="col-md-3 mb-4">
+              <h5 class="fw-bold mb-3">Reservations</h5>
+              <p class="mb-1">Tel: 123 4567 8910</p>
+              <p class="mb-1">Email: roomsy@gmail.com</p>
+            </div>
+            <div class="col-md-3 mb-4">
+              <h5 class="fw-bold mb-3">Our Location</h5>
+              <p class="mb-1">938 Aurora Boulevard,</p>
+              <p class="mb-3">Cubao, Quezon City, Metro Manila</p>
+              <div class="input-group">
+                <input type="email" class="form-control" placeholder="Email Address">
+                <button class="btn btn-warning"><i class="bi bi-send"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.body.classList.add("loaded");
+            setTimeout(() => {
+                document.getElementById("loader").style.display = "none";
+            }, 500);
+
+            loadReports();
+            updateBookingCount();
+        });
+
+        function loadReports() {
+            let user = JSON.parse(localStorage.getItem('user'));
+            if (!user || user.role !== 'admin') {
+                alert('Access denied. Please login as admin.');
+                window.location.href = 'main.html';
+                return;
+            }
+
+            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+            let messages = JSON.parse(localStorage.getItem('messages')) || [];
+
+            // Total bookings
+            document.getElementById('totalBookings').textContent = bookings.length;
+
+            // Total revenue
+            let totalRevenue = transactions.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+            document.getElementById('totalRevenue').textContent = '$' + totalRevenue.toFixed(2);
+
+            // Booking status chart
+            let statusCounts = { pending: 0, confirmed: 0 };
+            bookings.forEach(b => {
+                statusCounts[b.status] = (statusCounts[b.status] || 0) + 1;
+            });
+
+            const ctx = document.getElementById('bookingChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Pending', 'Confirmed'],
+                    datasets: [{
+                        data: [statusCounts.pending, statusCounts.confirmed],
+                        backgroundColor: ['#ffc107', '#28a745'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Booking Status Distribution'
+                        }
+                    }
+                }
+            });
+
+            // Transactions table
+            let tbody = document.querySelector('#transactionsTable tbody');
+            transactions.forEach(t => {
+                let row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${t.id}</td>
+                    <td>${t.bookingId}</td>
+                    <td>$${t.amount}</td>
+                    <td>${new Date(t.date).toLocaleDateString()}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Messages
+            let messagesList = document.getElementById('messagesList');
+            messages.forEach(m => {
+                let messageDiv = document.createElement('div');
+                messageDiv.className = 'card mb-3';
+                messageDiv.innerHTML = `
+                    <div class="card-body">
+                        <h5 class="card-title">${m.name} (${m.email})</h5>
+                        <p class="card-text">${m.message}</p>
+                        <small class="text-muted">${new Date(m.date).toLocaleString()}</small>
+                    </div>
+                `;
+                messagesList.appendChild(messageDiv);
+            });
+
+            // Subscribers list
+            let subscribers = JSON.parse(localStorage.getItem('subscribers')) || [];
+            let subList = document.getElementById('subscribersList');
+            subscribers.forEach(s => {
+                let li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.textContent = s;
+                subList.appendChild(li);
+            });
+        }
+
+        function updateBookingCount() {
+            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            document.getElementById('bookingCount').textContent = bookings.length;
+        }
+    </script>
+</body>
+</html>

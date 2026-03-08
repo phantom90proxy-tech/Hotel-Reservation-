@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings</title>
+    <link rel = "icon" href = "assets/logo.jpg" type = "image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="loader">
+        <div class="spinner-border text-warning" role="status">
+            <span class="visually-hidden">Loading...</span>
+         </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+          <a class="navbar-brand fw-bold" href="main.html">
+            <img src="assets/logo.jpg" alt="Roomsy Logo" style="height:32px; vertical-align:middle;">
+            Roomsy
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+              <li class="nav-item"><a class="nav-link" href="main.html"><i class="fas fa-home"></i> Home</a></li>
+              <li class="nav-item"><a class="nav-link" href="room.html"><i class="fas fa-bed"></i> Rooms</a></li>
+              <li class="nav-item"><a class="nav-link" href="bookings.html"><i class="fas fa-calendar-check"></i> My Bookings <span class="badge bg-warning" id="bookingCount">0</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+              <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-info-circle"></i> About</a></li>
+              <li class="nav-item"><a class="nav-link" href="contact.html"><i class="fas fa-phone" aria-hidden="true"></i> Contact</a></li>
+            </ul>
+            <ul class="navbar-nav">
+              <li class="nav-item" id="loginBtn">
+                <button class="btn btn-outline-light" onclick="showLoginModal()"><i class="fas fa-user"></i> Login</button>
+              </li>
+              <li class="nav-item" id="logoutBtn" style="display: none;">
+                <button class="btn btn-outline-light" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+              </li>
+            </ul>
+          </div>
+        </div>
+    </nav>
+
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">My Bookings</h2>
+            <div class="mb-4">
+                <input type="text" id="searchBookings" class="form-control" placeholder="Search bookings by room type, status, or date...">
+            </div>
+            <div id="bookingsList" class="row g-4">
+                <!-- Bookings will be loaded here -->
+            </div>
+            <div id="noBookings" class="text-center" style="display: none;">
+                <p>No bookings found. <a href="main.html">Make a booking</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="login()">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="paymentModalLabel">Complete Payment</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Total Amount: $<span id="totalAmount">0</span></p>
+                    <form id="paymentForm">
+                        <div class="mb-3">
+                            <label for="cardNumber" class="form-label">Card Number</label>
+                            <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="expiry" class="form-label">Expiry Date</label>
+                                <input type="text" class="form-control" id="expiry" placeholder="MM/YY" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="cvv" class="form-label">CVV</label>
+                                <input type="text" class="form-control" id="cvv" placeholder="123" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" onclick="processPayment()">Pay Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="container">
+          <div class="row">
+            <div class="col-md-3 mb-4">
+              <h4 class="fw-bold text-warning">Roomsy</h4>
+              <div class="d-flex gap-3 my-3">
+                <a href="#" class="text-light fs-5"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="text-light fs-5"><i class="bi bi-twitter"></i></a>
+                <a href="#" class="text-light fs-5"><i class="bi bi-tiktok"></i></a>
+                <a href="#" class="text-light fs-5"><i class="bi bi-github"></i></a>
+              </div>
+              <p class="small">&copy; 2025 All rights reserved | Made by Carmen</p>
+            </div>
+            <div class="col-md-3 mb-4">
+              <h5 class="fw-bold mb-3">Quick Links</h5>
+              <ul class="list-unstyled">
+                <li><a href="#" class="text-light text-decoration-none">About Roomsy</a></li>
+                <li><a href="room.html" class="text-light text-decoration-none">Our Best Rooms</a></li>
+              </ul>
+            </div>
+            <div class="col-md-3 mb-4">
+              <h5 class="fw-bold mb-3">Reservations</h5>
+              <p class="mb-1">Tel: 123 4567 8910</p>
+              <p class="mb-1">Email: roomsy@gmail.com</p>
+            </div>
+            <div class="col-md-3 mb-4">
+              <h5 class="fw-bold mb-3">Our Location</h5>
+              <p class="mb-1">938 Aurora Boulevard,</p>
+              <p class="mb-3">Cubao, Quezon City, Metro Manila</p>
+              <div class="input-group">
+                <input type="email" class="form-control" placeholder="Email Address">
+                <button class="btn btn-warning"><i class="bi bi-send"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.body.classList.add("loaded");
+            setTimeout(() => {
+                document.getElementById("loader").style.display = "none";
+            }, 500);
+
+            // Check login status
+            let user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'block';
+            }
+
+            loadBookings();
+            updateBookingCount();
+
+            // Add search functionality
+            document.getElementById('searchBookings').addEventListener('input', loadBookings);
+        });
+
+        function loadBookings() {
+            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            let bookingsList = document.getElementById('bookingsList');
+            let noBookings = document.getElementById('noBookings');
+            let searchTerm = document.getElementById('searchBookings').value.toLowerCase();
+
+            // Clear existing bookings
+            bookingsList.innerHTML = '';
+
+            // Filter bookings based on search term
+            let filteredBookings = bookings.filter(booking => {
+                return booking.id.toString().includes(searchTerm) ||
+                       booking.roomType.toLowerCase().includes(searchTerm) ||
+                       booking.status.toLowerCase().includes(searchTerm) ||
+                       booking.checkin.includes(searchTerm) ||
+                       booking.checkout.includes(searchTerm);
+            });
+
+            if (filteredBookings.length === 0) {
+                noBookings.style.display = 'block';
+                return;
+            }
+
+            noBookings.style.display = 'none';
+
+            filteredBookings.forEach(booking => {
+                let bookingCard = document.createElement('div');
+                bookingCard.className = 'col-md-6';
+                bookingCard.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Booking #${booking.id}</h5>
+                            <p class="card-text">
+                                Check-in: ${booking.checkin}<br>
+                                Check-out: ${booking.checkout}<br>
+                                Room Type: ${booking.roomType}<br>
+                                Adults: ${booking.adults}<br>
+                                Children: ${booking.children}<br>
+                                Rooms: ${booking.rooms}<br>
+                                Status: <span class="badge bg-${booking.status === 'confirmed' ? 'success' : 'warning'}">${booking.status}</span>
+                            </p>
+                            <button class="btn btn-primary" onclick="confirmBooking(${booking.id})">Confirm Booking</button>
+                            <button class="btn btn-danger ms-2" onclick="cancelBooking(${booking.id})">Cancel</button>
+                        </div>
+                    </div>
+                `;
+                bookingsList.appendChild(bookingCard);
+            });
+        }
+
+        function confirmBooking(id) {
+            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            let booking = bookings.find(b => b.id == id);
+            if (booking) {
+                // Calculate total based on room type
+                let roomPrices = {
+                    'superior': 50,
+                    'deluxe': 55,
+                    'family': 50,
+                    'double': 29,
+                    'classic': 25,
+                    'deluxe-double': 150
+                };
+                let checkin = new Date(booking.checkin);
+                let checkout = new Date(booking.checkout);
+                let nights = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+                let pricePerNight = roomPrices[booking.roomType] || 50;
+                let total = nights * pricePerNight * parseInt(booking.rooms);
+                document.getElementById('totalAmount').textContent = total;
+                currentBookingId = id;
+                var myModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+                myModal.show();
+            }
+        }
+
+        let currentBookingId = null;
+
+        function processPayment() {
+            // Simulate payment processing
+            let cardNumber = document.getElementById('cardNumber').value.trim();
+            let expiry = document.getElementById('expiry').value.trim();
+            let cvv = document.getElementById('cvv').value.trim();
+            
+            if (!cardNumber || !expiry || !cvv) {
+                alert('Please fill all payment details.');
+                return;
+            }
+            
+            // Basic validation
+            if (cardNumber.length < 13 || cardNumber.length > 19) {
+                alert('Invalid card number.');
+                return;
+            }
+            if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+                alert('Invalid expiry date format (MM/YY).');
+                return;
+            }
+            if (cvv.length !== 3) {
+                alert('Invalid CVV.');
+                return;
+            }
+            
+            // Simulate success
+            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            let booking = bookings.find(b => b.id == currentBookingId);
+            if (booking) {
+                booking.status = 'confirmed';
+                booking.payment = { cardNumber: '**** **** **** ' + cardNumber.slice(-4), amount: document.getElementById('totalAmount').textContent };
+                localStorage.setItem('bookings', JSON.stringify(bookings));
+                
+                // Store transaction
+                let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+                transactions.push({
+                    id: Date.now(),
+                    bookingId: currentBookingId,
+                    amount: booking.payment.amount,
+                    date: new Date().toISOString()
+                });
+                localStorage.setItem('transactions', JSON.stringify(transactions));
+                
+                bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
+                location.reload();
+            }
+        }
+
+        function cancelBooking(id) {
+            if (confirm('Are you sure you want to cancel this booking?')) {
+                let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+                bookings = bookings.filter(b => b.id != id);
+                localStorage.setItem('bookings', JSON.stringify(bookings));
+                updateBookingCount();
+                location.reload();
+            }
+        }
+
+        function showLoginModal() {
+            var myModal = new bootstrap.Modal(document.getElementById('loginModal'));
+            myModal.show();
+        }
+
+        function login() {
+            let username = document.getElementById('username').value;
+            let password = document.getElementById('password').value;
+            
+            if (username === 'admin' && password === 'admin') {
+                localStorage.setItem('user', JSON.stringify({ username: username, role: 'admin' }));
+                bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'block';
+                alert('Logged in as admin!');
+                window.location.href = 'reports.html';
+            } else {
+                alert('Invalid credentials!');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            document.getElementById('loginBtn').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'none';
+            alert('Logged out!');
+        }
+
+        function updateBookingCount() {
+            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            document.getElementById('bookingCount').textContent = bookings.length;
+        }
+    </script>
+</body>
+</html>
