@@ -9,6 +9,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker@latest/dist/litepicker.css">
   <link href="style.css" rel="stylesheet">
 </head>
 <body>
@@ -55,13 +56,9 @@
         <div class="col-lg-10">
           <div class="bg-white p-4 rounded shadow">
             <form id="reservationForm" class="row g-3">
-              <div class="col-md-2">
-                <label for="checkin" class="form-label fw-bold">Check In Date:</label>
-                <input type="date" id="checkin" class="form-control" min="<?php echo date('Y-m-d'); ?>">
-              </div>
-              <div class="col-md-2">
-                <label for="checkout" class="form-label fw-bold">Check In/Out Date:</label>
-                <input type="date" id="checkout" class="form-control" min="<?php echo date('Y-m-d'); ?>">
+              <div class="col-md-3">
+                <label for="dateRange" class="form-label fw-bold">Check In/Out Date:</label>
+                <input type="text" id="dateRange" class="form-control" placeholder="Check-in to Check-out">
               </div>
               <div class="col-md-2">
                 <label for="roomType" class="form-label fw-bold">Room Type:</label>
@@ -152,7 +149,7 @@
       <div class="row align-items-center">
         <div class="col-lg-6" data-aos="fade-right">
           <h2 class="mb-4">Dining Area</h2>
-          <p>Indulge in a culinary experience like no other at our exquisite dining area. Our chefs prepare a variety of dishes using the finest ingredients, ensuring a memorable meal for every guest.</p>
+          <p>Indulge in a culinary experience like no other at our exquisite dining area. Our chefs prepare a variety of dishes using the finest ingredients, ensuring a memorable meal for every guest.[...]
           <p>Whether you're enjoying a leisurely breakfast or a romantic dinner, our dining area offers a warm and inviting atmosphere, complemented by exceptional service.</p>
         </div>
         <div class="col-lg-6 text-center" data-aos="fade-left">
@@ -189,8 +186,7 @@
           <img src="assets/spa.jpg" class="img-fluid rounded shadow" alt="Spa">
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
   <!-- Testimonials Section -->
   <section class="py-5 bg-light">
@@ -356,11 +352,21 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/litepicker@latest/dist/litepicker.js"></script>
 
   <script>
   AOS.init({
     duration: 1000,
     once: false
+  });
+
+  // Initialize Litepicker date range picker
+  new Litepicker({
+    element: document.getElementById('dateRange'),
+    checkIn: new Date(),
+    checkOut: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+    format: 'YYYY-MM-DD',
+    lang: 'en-US'
   });
 
   // Check login status on page load
@@ -419,23 +425,18 @@
 
   $(document).ready(function(){
     function checkAvailability() {
-      let checkin = $("#checkin").val().trim();
-      let checkout = $("#checkout").val().trim();
+      let dateRange = $("#dateRange").val().trim();
       let roomType = $("#roomType").val();
-      if (checkin && checkout && roomType) {
-        if (!isAvailable(checkin, checkout, roomType)) {
+      
+      if (dateRange && roomType) {
+        const [checkin, checkout] = dateRange.split(' - ');
+        if (checkin && checkout && !isAvailable(checkin, checkout, roomType)) {
           showToast('error','Selected room type unavailable for chosen dates.');
         }
       }
     }
 
-    $("#checkin, #checkout, #roomType").change(checkAvailability);
-
-    $("#checkin").change(function(){
-      let minDate = new Date($(this).val());
-      minDate.setDate(minDate.getDate()+1);
-      $("#checkout").attr('min', minDate.toISOString().split('T')[0]);
-    });
+    $("#dateRange, #roomType").change(checkAvailability);
 
     $("#reservationForm").submit(function(e){
       e.preventDefault();
@@ -446,61 +447,67 @@
       bookBtn.disabled = true;
       spinner.classList.remove('d-none');
       
-      let checkin = $("#checkin").val().trim();
-      let checkout = $("#checkout").val().trim();
+      let dateRange = $("#dateRange").val().trim();
       let roomType = $("#roomType").val();
       let adults = $("#adults").val();
       let children = $("#children").val();
       let rooms = $("#rooms").val();
       let message = "";
 
-      if(checkin === "" || checkout === "" || adults === "None" || rooms === "None"){
+      if(!dateRange || !dateRange.includes(' - ')){
+        message = "Please select check-in and check-out dates.";
+      } else if(adults === "None" || rooms === "None"){
         message = "Please fill out all the required fields before booking.";
-      } else if(new Date(checkout) <= new Date(checkin)){
-        message = "Check-out date must be later than check-in date.";
-      } else if(new Date(checkin) < new Date()){
-        message = "Check-in date cannot be in the past.";
-      } else if (!isAvailable(checkin, checkout, roomType)) {
-        message = "Selected room type is unavailable for these dates.";
+      } else {
+        const [checkin, checkout] = dateRange.split(' - ');
+        
+        if(new Date(checkout) <= new Date(checkin)){
+          message = "Check-out date must be later than check-in date.";
+        } else if(new Date(checkin) < new Date()){
+          message = "Check-in date cannot be in the past.";
+        } else if (!isAvailable(checkin, checkout, roomType)) {
+          message = "Selected room type is unavailable for these dates.";
+        } else {
+          // Store booking in localStorage
+          let booking = {
+            id: Date.now(),
+            checkin: checkin,
+            checkout: checkout,
+            roomType: roomType,
+            adults: adults,
+            children: children,
+            rooms: rooms,
+            status: 'pending',
+            timestamp: new Date().toISOString()
+          };
+          let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+          bookings.push(booking);
+          localStorage.setItem('bookings', JSON.stringify(bookings));
+          
+          // Update booking count
+          updateBookingCount();
+          
+          // Show success message
+          showToast('success', 'Booking submitted successfully! Check your bookings.');
+          
+          // Reset form
+          $("#reservationForm")[0].reset();
+          
+          // Hide loading state
+          setTimeout(() => {
+            bookBtn.disabled = false;
+            spinner.classList.add('d-none');
+          }, 1000);
+          return;
+        }
       }
 
       if(message !== ""){
         showToast('error', message);
-        // Hide loading state
-        bookBtn.disabled = false;
-        spinner.classList.add('d-none');
-      } else {
-        // Store booking in localStorage
-        let booking = {
-          id: Date.now(),
-          checkin: checkin,
-          checkout: checkout,
-          roomType: roomType,
-          adults: adults,
-          children: children,
-          rooms: rooms,
-          status: 'pending',
-          timestamp: new Date().toISOString()
-        };
-        let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
-        bookings.push(booking);
-        localStorage.setItem('bookings', JSON.stringify(bookings));
-        
-        // Update booking count
-        updateBookingCount();
-        
-        // Show success message
-        showToast('success', 'Booking submitted successfully! Check your bookings.');
-        
-        // Reset form
-        $("#reservationForm")[0].reset();
-        
-        // Hide loading state
-        setTimeout(() => {
-          bookBtn.disabled = false;
-          spinner.classList.add('d-none');
-        }, 1000);
       }
+      // Hide loading state
+      bookBtn.disabled = false;
+      spinner.classList.add('d-none');
     });
   });
 
